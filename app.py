@@ -1,9 +1,24 @@
 import streamlit as st
 import sys
 import os
+import importlib.util
 
-# Ensure app directory is on path — required for Streamlit Cloud
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# ── Path fix — must be FIRST, before any local imports ─────────────────────
+# Streamlit Cloud runs from a different working directory.
+# We force both the app root AND the tabs folder onto sys.path explicitly.
+_ROOT = os.path.dirname(os.path.abspath(__file__))
+_TABS = os.path.join(_ROOT, "tabs")
+for _p in [_ROOT, _TABS]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+# ── Helper: import a tab module by file path (100% reliable on Cloud) ──────
+def _load_tab(name: str):
+    path = os.path.join(_TABS, f"{name}.py")
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod  = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 st.set_page_config(
     page_title="Finance Command Centre",
@@ -69,26 +84,30 @@ hr { border-color: #21262d !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Session state init ─────────────────────────────────────────────────────
+# ── Session state + DB init ─────────────────────────────────────────────────
 from state import init_state
 init_state()
 
-# ── Sidebar ────────────────────────────────────────────────────────────────
+# ── Sidebar ─────────────────────────────────────────────────────────────────
 from sidebar import render_sidebar
 render_sidebar()
 
-# ── Page routing ───────────────────────────────────────────────────────────
+# ── Page routing ─────────────────────────────────────────────────────────────
 page = st.session_state.get("page", "Overview")
 
-if page == "Overview":
-    from tabs import overview; overview.render()
-elif page == "Inventory":
-    from tabs import inventory; inventory.render()
-elif page == "P&L":
-    from tabs import pnl; pnl.render()
-elif page == "Working Capital":
-    from tabs import working_capital; working_capital.render()
-elif page == "Receivables":
-    from tabs import receivables; receivables.render()
-elif page == "Supplier Performance":
-    from tabs import supplier; supplier.render()
+TAB_MAP = {
+    "Overview":             "overview",
+    "Inventory":            "inventory",
+    "P&L":                  "pnl",
+    "Working Capital":      "working_capital",
+    "Receivables":          "receivables",
+    "Supplier Performance": "supplier",
+}
+
+tab_file = TAB_MAP.get(page, "overview")
+try:
+    mod = _load_tab(tab_file)
+    mod.render()
+except Exception as e:
+    st.error(f"Error loading page '{page}': {e}")
+    st.exception(e)
