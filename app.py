@@ -1,4 +1,9 @@
 import streamlit as st
+import sys
+import os
+
+# Ensure app directory is on path — required for Streamlit Cloud
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 st.set_page_config(
     page_title="Finance Command Centre",
@@ -14,34 +19,31 @@ st.markdown("""
 
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-/* Sidebar */
 section[data-testid="stSidebar"] {
     background: #0f1117;
     border-right: 1px solid #1e2130;
 }
 section[data-testid="stSidebar"] * { color: #c9d1d9 !important; }
-section[data-testid="stSidebar"] .stRadio label { 
+section[data-testid="stSidebar"] .stRadio label {
     padding: 6px 10px; border-radius: 6px; cursor: pointer;
 }
 section[data-testid="stSidebar"] .stRadio label:hover { background: #1e2130; }
 
-/* Metric cards */
 [data-testid="metric-container"] {
     background: #0d1117;
     border: 1px solid #21262d;
     border-radius: 10px;
     padding: 16px !important;
 }
-[data-testid="metric-container"] [data-testid="stMetricLabel"] { 
+[data-testid="metric-container"] [data-testid="stMetricLabel"] {
     color: #8b949e !important; font-size: 12px !important; letter-spacing: 0.5px;
 }
-[data-testid="metric-container"] [data-testid="stMetricValue"] { 
+[data-testid="metric-container"] [data-testid="stMetricValue"] {
     color: #e6edf3 !important; font-size: 22px !important; font-weight: 600;
     font-family: 'IBM Plex Mono', monospace;
 }
 [data-testid="metric-container"] [data-testid="stMetricDelta"] svg { display: none; }
 
-/* Upload widget */
 [data-testid="stFileUploader"] {
     border: 1.5px dashed #30363d !important;
     border-radius: 10px;
@@ -49,23 +51,16 @@ section[data-testid="stSidebar"] .stRadio label:hover { background: #1e2130; }
     background: #0d1117;
 }
 
-/* Tabs */
 .stTabs [data-baseweb="tab-list"] { background: #0d1117; border-radius: 8px; padding: 4px; }
 .stTabs [data-baseweb="tab"] { border-radius: 6px; color: #8b949e; font-weight: 500; }
 .stTabs [aria-selected="true"] { background: #1f6feb !important; color: #fff !important; }
 
-/* Dataframes */
 [data-testid="stDataFrame"] { border: 1px solid #21262d; border-radius: 8px; }
-
-/* Divider */
 hr { border-color: #21262d !important; }
-
-/* Expander */
 [data-testid="stExpander"] { border: 1px solid #21262d !important; border-radius: 8px; background: #0d1117; }
 
-/* Section headers */
 .section-header {
-    font-size: 11px; font-weight: 600; letter-spacing: 1.5px; 
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
     color: #8b949e; text-transform: uppercase; margin: 16px 0 8px;
 }
 .kpi-good { color: #3fb950; font-weight: 600; }
